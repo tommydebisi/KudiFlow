@@ -45,9 +45,20 @@ const userSchema = new mongoose.Schema({
 
 //fire a function before doc saved to db
 userSchema.pre('save', async function (next) {
-  const salt = await bcrypt.genSalt()
+  if (!this.password) next();
+  this.password = await bcrypt.hash(this.password, 12);
   next();
-})
+});
+
+// Instance method.available in the whole model
+userSchema.methods.comparePassword = async function (
+  inputtedPassword,
+  userPassword
+) {
+  const passwordStatus = await bcrypt.compare(inputtedPassword, userPassword);
+  return passwordStatus;
+};
+
 
 const User = mongoose.model('User', userSchema);
 module.exports = {

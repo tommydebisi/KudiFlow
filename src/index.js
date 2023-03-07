@@ -8,7 +8,7 @@ const app = require('./app');
 
 
 // configure dotenv and port
-dotenv.config();
+dotenv.config({ path: "./.env" });
 
 
 async function connectDb() {
