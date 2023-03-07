@@ -1,17 +1,6 @@
 const { createUserSchema } = require('../validators');
 const { User } = require('./../models');
 
-const errorMessages = {
-  name: 'Name has to start with a letter, can contain spaces, must be at least 3 characters, and no more than 30 characters. No special characters allowed',
-  email: 'Email has to start with a letter, can contain numbers and underscores, must be at least 3 characters, must have @com or @net. No spaces and no other special characters allowed',
-  password: 'Password must be between 8 and 30 characters and contain at least one letter, one number, and one special character: !@#$%^&*()_+-=[]{};:\\|,.<>/?',
-};
-
-const errorMap = {
-  name: 'Name',
-  email: 'Email',
-  password: 'Password',
-};
 
 const signup = async (req, res, next) => {
   const { name, email, password } = req.body;
