@@ -1,12 +1,5 @@
-const connectDb = require('../index');
 const { User } = require('../models/User');
 const Track = require('../models/Track');
-
-connectDb().then(() => {
-  console.log('Database is Connected');
-  start()
-})
-  .catch((e) => console.log('error'));
 
 async function start() {
   try{
