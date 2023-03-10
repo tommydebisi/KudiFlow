@@ -1,6 +1,9 @@
+const dbClient = require('../utils/db');
+const redisClient = require('../utils/redis');
 const { User } = require('../models/User');
 const Track = require('../models/Track');
 
+start()
 async function start() {
   try{
     const user = await User.where('email').equals('tommy@foo.com').limit(1);
