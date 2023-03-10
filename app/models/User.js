@@ -9,6 +9,10 @@ const imageSchema = new mongoose.Schema({
 const Image = mongoose.model('Image', imageSchema);
 
 const userSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: true,
+  },
   email: {
     type: String,
     lowercase: true,
