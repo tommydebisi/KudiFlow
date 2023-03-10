@@ -1,5 +1,5 @@
-const dbClient = require('../utils/db');
-const redisClient = require('../utils/redis');
+const dbClient = require('../../src/utils/db');
+const redisClient = require('../../src/utils/redis');
 const { User } = require('../models/User');
 const Track = require('../models/Track');
 
