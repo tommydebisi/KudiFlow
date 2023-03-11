@@ -1,13 +1,12 @@
+require('dotenv').config()
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
-
 const app = express();
+const authRouter = require('./routes/authRoute');
 
 
 // parse json in request body
 app.use(express.json());
-app.use(bodyParser.json());
 
 // parse form in request body
 app.use(express.urlencoded({extended: false}));
@@ -15,8 +14,10 @@ app.use(express.urlencoded({extended: false}));
 // promotes cross origin resource sharing
 app.use(cors());
 
+// use middleware for authRequests
+app.use('/session', authRouter);
 
-const port = 5000
+const port = 5000;
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
