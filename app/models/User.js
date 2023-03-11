@@ -13,16 +13,32 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
+    minLength: [4, 'username must be more than 4 characters'],
+    validate: {
+      validator: function (v) {
+        return /^\w[a-zA-Z0-9]+/.test(v);
+      },
+      message: (props) => {
+        return "shouldn't contain special character and spaces"
+      }
+    }
   },
   email: {
     type: String,
     lowercase: true,
-    required: true
+    required: true,
+    validate: {
+      validator: function (v) {
+        return /^[a-zA-Z0-9]+@\w+.\w+/.test(v);
+      },
+      message: function (props) {
+        return `${props.value} is not a valid email!`
+      }
+    }
   },
   hashed_password: {
     type: String,
     required: true,
-    minLength: [6, 'Minimum password length is 6']
   },
   createdAt: {
     type: Date,
@@ -46,20 +62,12 @@ const userSchema = new mongoose.Schema({
   versionKey: '0.1'
 });
 
-
-//fire a function before doc saved to db
-userSchema.pre('save', async function (next) {
-  if (!this.password) next();
-  this.password = await bcrypt.hash(this.password, 12);
-  next();
-});
-
 // Instance method.available in the whole model
 userSchema.methods.comparePassword = async function (
   inputtedPassword,
   userPassword
 ) {
-  const passwordStatus = await bcrypt.compare(inputtedPassword, userPassword);
+  const passwordStatus = bcrypt.compare(inputtedPassword, userPassword);
   return passwordStatus;
 };
 
