@@ -1,6 +1,4 @@
-require('dotenv').config();
 const redis = require('redis');
-const { promisify } = require('util');
 
 
 class RedisClient {
@@ -12,9 +10,6 @@ class RedisClient {
         port: process.env.REDIS_PORT,
       },
     });
-    this._get = promisify(this.client.get).bind(this.client);
-    this._set = promisify(this.client.set).bind(this.client);
-    this._del = promisify(this.client.del).bind(this.client);
 
     this.client.on('connect', () => {
       console.log('Redis Connected');
@@ -33,7 +28,7 @@ class RedisClient {
   * @returns {any} The value of the key
   */
   async get(key) {
-    return this._get(key);
+    return this.client.get(key);
   }
 
   /**
@@ -44,7 +39,8 @@ class RedisClient {
    */
   async set(key, value) {
     // set key with expiration
-    await this._set(key, value);
+    await this.client.set(key, value);
+    // return this._set(key, value);
   }
 
   /**
@@ -52,7 +48,7 @@ class RedisClient {
    * @param {string} key - key to delete from database
    */
   async del(key) {
-    await this._del(key);
+    await this.client.del(key);
   }
 }
 
