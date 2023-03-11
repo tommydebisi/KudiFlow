@@ -22,7 +22,7 @@ async function _hashPassword(password) {
  */
 function generateAccessToken(obj) {
   return jwt.sign(obj, process.env.API_SECRET, {
-    expiresIn: '15s'
+    expiresIn: '15min'
   });
 }
 
