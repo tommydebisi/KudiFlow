@@ -15,7 +15,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(cors());
 
 // use middleware for authRequests
-app.use('/session', authRouter);
+app.use('/account', authRouter);
 
 const port = 5000;
 app.listen(port, () => {

@@ -38,9 +38,7 @@ class RedisClient {
    * @param {string} value - value to set with key
    */
   async set(key, value) {
-    // set key with expiration
     await this.client.set(key, value);
-    // return this._set(key, value);
   }
 
   /**
@@ -49,6 +47,17 @@ class RedisClient {
    */
   async del(key) {
     await this.client.del(key);
+  }
+
+  /**
+   * sets a key and value with expiriy in db
+   *
+   * @param {string} key - key to set
+   * @param {string} value - value to set with key
+   * @param {number} time - time to expire
+   */
+  async setex(key, value, time) {
+    await this.client.setEx(key, time, value);
   }
 }
 
