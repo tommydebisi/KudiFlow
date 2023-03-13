@@ -1,30 +1,12 @@
 const jwt = require('jsonwebtoken');
-const { hash, compare } = require('bcrypt');
-const { User } = require('../models/User');
-const Track = require('../models/Track');
+const { compare } = require('bcrypt');
+const { Types } = require('mongoose');
+const { randomBytes } = require('crypto');
 const dbClient = require('../utils/db');
 const redisClient = require('../utils/redis');
+const { User } = require('../models/User');
+const { hashPassword, generateAccessToken, sendEmail } = require('../utils/helper');
 
-/**
- * encrypts password
- * @param {string} password
- * @returns encrypted password
- */
-async function _hashPassword(password) {
-  // auto generate a salt and hash
-  return hash(password, 10);
-}
-
-/**
- * generates new access token
- * @param {object} obj - field to pass in token
- * @returns {string} accessToken
- */
-function generateAccessToken(obj) {
-  return jwt.sign(obj, process.env.API_SECRET, {
-    expiresIn: '15min'
-  });
-}
 
 class AuthController {
   static async signUp(req, res) {
@@ -40,7 +22,7 @@ class AuthController {
     const existingUser = await dbClient.getSchemaOne(User, { email });
     if (existingUser) return res.status(400).json({ error: 'User already exists' });
 
-    const hashed_password = await _hashPassword(password);
+    const hashed_password = await hashPassword(password);
     try {
       // Create new user
       const user = await User.create({ username, email, hashed_password });
@@ -56,6 +38,9 @@ class AuthController {
 
     // check if email and password is present
     if (!email) return res.status(400).json({ error: 'Missing email' });
+
+    // do the validation for email here
+
     if (!password) return res.status(400).json({ error: 'Missing password' });
 
     const user = await dbClient.getSchemaOne(User, { email });
@@ -100,6 +85,40 @@ class AuthController {
   static async logout(req, res) {
     await redisClient.del(`auth_${req.user}`);
     return res.status(204).send('\n');
+  }
+
+  static async forgot(req, res) {
+    const { email } = req.body;
+
+    // check if the user email is present in db
+    const user = await dbClient.getSchemaOne(User, { email });
+
+    if (!user) return res.status(404).json({ error: "Not Found" });
+    const resetToken = require('crypto').randomBytes(30).toString('hex');
+
+    try {
+      // store reset password with expiry for 2min
+      await redisClient.setex(`reset_${resetToken}`, user._id.toString(), 300);
+    } catch (e) {
+      return res.status(400).json({ error: e.message });
+    }
+
+    // send email with reset token
+    sendEmail(resetToken, email);
+
+    return res.status(202).json({ message: 'success' });
+  }
+
+  static async postReset(req, res) {
+    // get and update user with id, change userId in str to objectId
+    const user = await dbClient.getSchemaOne(User, { _id: new Types.ObjectId(req.userId) });
+
+    if (!user) return res.send('Error getting user');
+
+    user.hashed_password = await hashPassword(req.newPass);
+    user.save();
+
+    return res.status(200).json({ message: 'success' })
   }
 }
 
