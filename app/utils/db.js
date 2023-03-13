@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-
-
 class DBClient {
   constructor() {
     this._username = process.env.DB_USERNAME;
@@ -8,7 +6,12 @@ class DBClient {
     this._db = process.env.DB_NAME;
 
     mongoose.connect(
-      `mongodb+srv://${this._username}:${this._password}@cluster0.ijtgnu3.mongodb.net/${this._db}`
+     `mongodb+srv://${this._username}:${this._password}@cluster0.ijtgnu3.mongodb.net/${this._db}`
+
+    //'mongodb://127.0.0.1:27017/product'
+    
+
+     
     ).then(() => console.log('db connected'));
   }
 

@@ -5,6 +5,7 @@ const app = express();
 const authRouter = require('./routes/authRoute');
 
 
+
 // parse json in request body
 app.use(express.json());
 
